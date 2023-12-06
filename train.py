@@ -25,25 +25,6 @@ import random
 from time import perf_counter
 
 torch.set_default_dtype(torch.float32)
-### 3: batch size: 256, embed_size 16, gpu 1
-### 4: batch size: 512, embed_size: 32, gpu 2
-### 5: bs: 512, embed_size: 16, gpu 1, window 600, 850
-### 6:bs: 512, embed_size: 16, gpu 3, window 300,600
-###7: bs: 512, embed_size: 16, gpu 1, window 300,600
-###8: bs: 512, embed_size: 32, gpu 1, window 300,600
-###9: bs: 512, embed_size: 16, gpu 1, window 300,600
-###10: bs: 512, embed_size: 32, gpu 1, window 300,600
-###11: bs: 512, embed_size: 16, gpu 1, window 300,600, with W
-###12: bs: 512, embed_size: 16, gpu 1, window 300,600, with W, num of layer 2,
-###13: bs: 512, embed_size: 64, gpu 1, window 300,600, with W, num of layer 2,
-###14: bs: 512, embed_size: 16, gpu 1, window 300,600, with W, num of layer 2,dropout = 0.2,
-###15: bs: 512, embed_size: 16, gpu 2, window 300,600, with W, num of layer 2,dropout = 0.2, regularization 5e-2
-###16: bs: 512, embed_size: 16, gpu 1, window 300,600, with W, num of layer 3,dropout = 0.2, regularization 5e-2
-###20: bs: 512, embed_size: 16, gpu 0, window 300,600, with W, num of layer 1,dropout = 0.2, regularization 5e-3, space encoder, gamma 0.1
-
-###21: bs: 512, embed_size: 16, gpu 0, window 300,600, with W, num of layer 1,dropout = 0.2, regularization 5e-3, space encoder, gamma 0.3
-
-###22: bs: 512, embed_size: 128, gpu 0, window 300,600, with W, num of layer 1,dropout = 0.2, regularization 5e-3, space encoder, gamma 0.1
 
 
 TIME_WINDOW = 700
@@ -312,44 +293,7 @@ train_features_data, train_label,train_mask,train_downsample = data_augumentatio
 
 
 
-# shape = train_features_data.shape
-# train_new_features_data = torch.from_numpy(train_features_data).float().to(device)
 
-# shape = train_features_data.shape
-# train_input_seq = torch.from_numpy(train_features_data[:,:,:8]).float().to(device)
-# train_output_seq = torch.from_numpy(train_features_data[:,0,:8][:,np.newaxis,:]).float().to(device)
-
-# train_input_time = torch.from_numpy(train_features_data[:,:,-1]).float().to(device)
-
-# train_input_space = torch.from_numpy(train_features_data[:,:,-3:-1]).float().to(device)
-# train_output_time = torch.from_numpy(train_features_data[:,0,-1][:,np.newaxis]).float().to(device)
-# train_output_space = torch.from_numpy(train_features_data[:,0,-3:-1][:,np.newaxis,:]).float().to(device)
-
-# train_label = torch.from_numpy(train_label).float().to(device)
-
-# shape = val_features_data.shape
-# val_input_seq = torch.from_numpy(val_features_data[:,:,:8]).float().to(device)
-# val_output_seq = torch.from_numpy(val_features_data[:,0,:8][:,np.newaxis,:]).float().to(device)
-
-# val_input_time = torch.from_numpy(val_features_data[:,:,-1]).float().to(device)
-
-# val_input_space = torch.from_numpy(val_features_data[:,:,-3:-1]).float().to(device)
-# val_output_time = torch.from_numpy(val_features_data[:,0,-1][:,np.newaxis]).float().to(device)
-# val_output_space = torch.from_numpy(val_features_data[:,0,-3:-1][:,np.newaxis,:]).float().to(device)
-
-# val_label = torch.from_numpy(val_label).float().to(device)
-
-# shape = test_features_data.shape
-# test_input_seq = torch.from_numpy(test_features_data[:,:,:8]).float().to(device)
-# test_output_seq = torch.from_numpy(test_features_data[:,0,:8][:,np.newaxis,:]).float().to(device)
-
-# test_input_time = torch.from_numpy(test_features_data[:,:,-1]).float().to(device)
-
-# test_input_space = torch.from_numpy(test_features_data[:,:,-3:-1]).float().to(device)
-# test_output_time = torch.from_numpy(test_features_data[:,0,-1][:,np.newaxis]).float().to(device)
-# test_output_space = torch.from_numpy(test_features_data[:,0,-3:-1][:,np.newaxis,:]).float().to(device)
-
-# test_label = torch.from_numpy(test_label).float().to(device)
 
 
 shape = train_features_data.shape
@@ -392,8 +336,7 @@ test_output_space = torch.from_numpy(test_features_data[:,0,-3:-1][:,np.newaxis,
 test_label = torch.from_numpy(test_label).to(dtype=torch.float32, device= device)
 
 
-# train_input_seq[:,0,-1] = 0
-# train_output_seq[:,0,-1] = 0
+
 val_input_seq[:,0,-1] = 0
 val_output_seq[:,0,-1] = 0
 test_input_seq[:,0,-1] = 0
@@ -529,33 +472,6 @@ train_upsample_data = generateTrainDataset(train_input_seq,train_input_time,trai
 
 print("finished train upsample data")
         
-# def generateTrainDataset(train_input_seq,train_input_time,train_input_space, train_new_features_data,train_src_mask,batch_train_downsample,
-#                         num_batch,BATCH_SIZE,train_instance):
-#     train_batch_sample = []
-#     for k in range(num_batch):
-#         s_idx = k * BATCH_SIZE
-
-#         e_idx = min(train_instance, s_idx + BATCH_SIZE)
-#         #feat_cut = torch.clone(train_data[s_idx:e_idx])
-#         #feat_cut[:,0, features.shape[1]-1] = 0
-#         for loop in [0] + list(np.random.randint(low=0, high = TIME_WINDOW, size =(number_selection-1,))):
-            
-#             label_cut = torch.clone(train_input_seq[s_idx:e_idx, loop, -1])
-#             train_input_cut = torch.clone(train_input_seq[s_idx:e_idx])
-#             train_input_cut[:, loop, -1] = 0
-            
-#             train_output_cut =  torch.clone(train_input_cut[:, loop,:]).unsqueeze(1)
-            
-            
-#             #train_output_cut[:, 0, -1] = 0
-#             train_output_time_cut = train_new_features_data[s_idx:e_idx,loop, -1].unsqueeze(1)
-#             train_output_space_cut = train_new_features_data[s_idx:e_idx,loop, -3:-1].unsqueeze(1)
-#             train_trg_mask_cut = train_src_mask[s_idx:e_idx, loop,:].unsqueeze(1)
-            
-#             train_batch_sample.append([train_input_cut, train_output_cut, batch_train_downsample[k],
-#                                   train_input_time[s_idx:e_idx], train_input_space[s_idx:e_idx],train_output_time_cut, 
-#                                   train_output_space_cut,train_src_mask[s_idx:e_idx],train_trg_mask_cut, label_cut])
-#     return train_batch_sample
 
 
 
